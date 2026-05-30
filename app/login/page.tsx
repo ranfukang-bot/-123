@@ -99,14 +99,12 @@ export default function LoginPage() {
   // 忘记密码 - 已发送页面
   if (mode === 'reset-sent') {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl" />
-
-        <div className="relative w-full max-w-md">
+      <div className="min-h-screen bg-[#f7f8fb] px-4 py-10">
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center">
+          <div className="w-full">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl animated-gradient flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gray-950 flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold gradient-text">PromptReel</span>
@@ -117,7 +115,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg text-center">
+          <div className="surface rounded-2xl bg-white p-8 text-center">
             <p className="text-sm text-gray-600 mb-6">
               请检查你的邮箱，点击邮件中的链接重置密码。重置完成后回来登录。
             </p>
@@ -131,20 +129,19 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      </div>
     )
   }
 
   // 忘记密码表单
   if (mode === 'forgot') {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl" />
-
-        <div className="relative w-full max-w-md">
+      <div className="min-h-screen bg-[#f7f8fb] px-4 py-10">
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center">
+          <div className="w-full">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl animated-gradient flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gray-950 flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold gradient-text">PromptReel</span>
@@ -153,7 +150,7 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-1">输入邮箱，我们将发送重置密码链接</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+          <div className="surface rounded-2xl bg-white p-8">
             <form onSubmit={handleForgotPassword} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium mb-2">邮箱</label>
@@ -180,7 +177,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full gradient-btn text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full gradient-btn text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -202,19 +199,28 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      </div>
     )
   }
 
   // 登录表单
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-[#f7f8fb] px-4 py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="hidden lg:block">
+          <p className="text-sm font-semibold text-[#2454d6]">欢迎回来</p>
+          <h2 className="mt-4 max-w-md text-4xl font-semibold leading-tight tracking-tight text-gray-950">
+            继续管理你的带货视频创作流程
+          </h2>
+          <p className="mt-5 max-w-md text-base leading-7 text-gray-600">
+            登录后查看历史记录、剩余额度和已生成的提示词。正式生产环境下，所有敏感调用都通过服务端代理处理。
+          </p>
+        </div>
 
-      <div className="relative w-full max-w-md">
+        <div className="mx-auto w-full max-w-md min-w-0 justify-self-center">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl animated-gradient flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gray-950 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-bold gradient-text">PromptReel</span>
@@ -223,7 +229,7 @@ export default function LoginPage() {
           <p className="text-gray-500 mt-1">登录你的账号继续使用</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+        <div className="surface rounded-2xl bg-white p-6 sm:p-8">
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm font-medium mb-2">邮箱</label>
@@ -280,7 +286,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full gradient-btn text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full gradient-btn text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -299,6 +305,7 @@ export default function LoginPage() {
               免费注册
             </Link>
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -66,7 +66,7 @@ export default function HistoryPage() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">历史记录</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-950">历史记录</h1>
         <p className="text-gray-500 mt-1">查看你之前生成的所有视频提示词</p>
       </div>
 
@@ -76,7 +76,7 @@ export default function HistoryPage() {
           <p className="text-gray-400 mt-4">加载中...</p>
         </div>
       ) : generations.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-50 flex items-center justify-center">
             <Film className="w-8 h-8 text-gray-300" />
           </div>
@@ -88,7 +88,7 @@ export default function HistoryPage() {
           {generations.map((gen) => (
             <div
               key={gen.id}
-              className="bg-white rounded-xl border border-gray-100 p-5 card-hover"
+              className="surface rounded-2xl bg-white p-5 card-hover"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -128,7 +128,7 @@ export default function HistoryPage() {
               </div>
 
               {/* Preview */}
-              <div className="bg-gray-50 rounded-lg p-4 max-h-32 overflow-hidden relative">
+              <div className="bg-[#f7f8fb] rounded-xl border border-gray-100 p-4 max-h-32 overflow-hidden relative">
                 <pre className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">
                   {gen.output_prompt.substring(0, 300)}...
                 </pre>

@@ -1,111 +1,105 @@
 import Link from 'next/link'
-import { ArrowRight, Play } from 'lucide-react'
+import { ArrowRight, CheckCircle2, ImagePlus, Layers3, Sparkles } from 'lucide-react'
+
+const outputModules = ['视频定位', '卖点提炼', '镜头语言', '场景调度', '口播节奏']
 
 export default function Hero() {
   return (
-    <section className="relative pt-32 pb-20 overflow-hidden">
-      {/* Background Decoration */}
-      <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl animate-pulse-slow" />
-      <div className="absolute top-40 right-1/4 w-80 h-80 bg-cyan-200/30 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }} />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 mb-8">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span className="text-sm text-indigo-700 font-medium">AI 驱动的视频提示词生成</span>
+    <section className="relative overflow-hidden bg-[#f7f8fb] pt-28">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
+        <div className="max-w-2xl">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700">
+            <Sparkles className="h-4 w-4 text-[#2454d6]" />
+            面向国内带货团队的 AI 创作工具
           </div>
 
-          {/* Title */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-            上传商品图
-            <br />
-            <span className="gradient-text">一键生成专业视频提示词</span>
+          <h1 className="text-3xl font-semibold leading-tight tracking-tight text-gray-950 sm:text-5xl lg:text-6xl">
+            把商品图变成
+            <span className="block text-[#2454d6]">可直接拍摄的</span>
+            <span className="block text-[#2454d6]">视频提示词</span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            专为带货达人打造的 AI 视频提示词生成器。上传商品图片，选择视频风格，
-            即可获得适用于 Runway、Pika、Sora 等工具的专业级提示词。
+          <p className="mt-6 max-w-xl text-base leading-8 text-gray-600 sm:text-lg">
+            PromptReel 帮你把商品卖点、镜头、场景、节奏和 AI 视频工具参数整理成结构化方案。适合短视频带货、商品种草、直播切片二创和团队批量出片。
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/register"
-              className="gradient-btn text-white font-medium px-8 py-3.5 rounded-full text-lg flex items-center gap-2"
-            >
-              免费开始体验
-              <ArrowRight className="w-5 h-5" />
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link href="/register" className="gradient-btn inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white">
+              开始生成
+              <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              href="/#how-it-works"
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium px-6 py-3.5 rounded-full border border-gray-200 hover:border-gray-300 transition-all"
-            >
-              <Play className="w-5 h-5" />
-              了解工作原理
+            <Link href="/pricing" className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-800 hover:border-gray-400">
+              查看套餐
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-            <div>
-              <div className="text-3xl font-bold gradient-text">10+</div>
-              <div className="text-sm text-gray-500 mt-1">专业模块</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text">5s</div>
-              <div className="text-sm text-gray-500 mt-1">生成速度</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text">5+</div>
-              <div className="text-sm text-gray-500 mt-1">视频风格</div>
-            </div>
+          <div className="mt-8 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+            {['注册送 3 次体验', '输出 10 个专业模块', '适配主流 AI 视频工具'].map((item) => (
+              <div key={item} className="flex items-center gap-2 text-sm text-gray-600">
+                <CheckCircle2 className="h-4 w-4 text-[#0f9f7a]" />
+                {item}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Preview Card */}
-        <div className="mt-20 relative max-w-5xl mx-auto">
-          <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-cyan-500/20 rounded-2xl blur-xl" />
-          <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
-              <span className="ml-2 text-xs text-gray-400">创作工作台预览</span>
-            </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Input Side */}
-              <div className="space-y-4">
-                <div className="text-sm font-medium text-gray-500">输入</div>
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-indigo-50 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-400">拖拽商品图片到此处</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-10 bg-gray-50 rounded-lg" />
-                  <div className="h-10 bg-gray-50 rounded-lg" />
-                </div>
+        <div className="relative">
+          <div className="surface overflow-hidden rounded-2xl bg-white">
+            <div className="flex items-center justify-between border-b border-gray-200 bg-[#111827] px-5 py-4 text-white">
+              <div>
+                <p className="text-sm font-semibold">PromptReel 工作台</p>
+                <p className="mt-1 text-xs text-gray-300">商品图分析 → 视频提示词</p>
               </div>
-              {/* Output Side */}
-              <div className="space-y-3">
-                <div className="text-sm font-medium text-gray-500">输出</div>
-                {['视频类型', '画面风格', '场景环境', '镜头语言', '光线色彩'].map((module) => (
-                  <div key={module} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0" />
+              <div className="hidden rounded-full bg-white/10 px-3 py-1 text-xs sm:block">Production Preview</div>
+            </div>
+
+            <div className="grid gap-0 lg:grid-cols-[0.78fr_1fr]">
+              <div className="border-b border-gray-200 p-5 lg:border-b-0 lg:border-r">
+                <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <ImagePlus className="h-4 w-4 text-[#2454d6]" />
+                  商品输入
+                </div>
+                <div className="aspect-[4/3] rounded-xl border border-dashed border-gray-300 bg-[linear-gradient(135deg,#eef2ff,#f8fafc_48%,#ecfeff)] p-4">
+                  <div className="flex h-full flex-col justify-between rounded-lg bg-white/70 p-4">
+                    <div className="h-20 rounded-lg bg-[#111827]" />
                     <div>
-                      <div className="text-xs font-medium text-indigo-600">[{module}]</div>
-                      <div className="h-2 bg-gray-200 rounded mt-1.5 w-full" />
-                      <div className="h-2 bg-gray-200 rounded mt-1 w-3/4" />
+                      <div className="h-3 w-3/4 rounded bg-gray-300" />
+                      <div className="mt-2 h-3 w-1/2 rounded bg-gray-200" />
                     </div>
                   </div>
-                ))}
+                </div>
+                <div className="mt-4 space-y-2">
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">商品名称：夏季防晒夹克</div>
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500">平台：抖音 / 小红书</div>
+                </div>
+              </div>
+
+              <div className="p-5">
+                <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <Layers3 className="h-4 w-4 text-[#0f9f7a]" />
+                  结构化输出
+                </div>
+                <div className="space-y-3">
+                  {outputModules.map((module, index) => (
+                    <div key={module} className="rounded-xl border border-gray-200 bg-white p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-gray-900">[{module}]</span>
+                        <span className="text-[11px] text-gray-400">0{index + 1}</span>
+                      </div>
+                      <div className="mt-3 space-y-2">
+                        <div className="h-2 rounded bg-gray-200" />
+                        <div className="h-2 w-4/5 rounded bg-gray-100" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+          </div>
+
+          <div className="absolute -bottom-5 left-6 hidden rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-lg md:block">
+            <p className="text-xs text-gray-500">今日生成</p>
+            <p className="mt-1 text-xl font-semibold text-gray-950">128 条</p>
           </div>
         </div>
       </div>

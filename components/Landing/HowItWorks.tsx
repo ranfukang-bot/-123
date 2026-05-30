@@ -1,75 +1,55 @@
-import { Upload, Cpu, Copy } from 'lucide-react'
+import { Copy, FileCheck2, Upload } from 'lucide-react'
 
 const steps = [
   {
     icon: Upload,
-    step: '01',
-    title: '上传商品图片',
-    description: '拍摄或上传你的商品图片，填写商品名称、目标平台等基本信息。',
-    detail: '支持 JPG、PNG、WebP 格式，最大 10MB',
+    title: '输入商品资料',
+    description: '上传商品图，填写商品名、目标平台和想强调的卖点。',
   },
   {
-    icon: Cpu,
-    step: '02',
-    title: 'AI 智能分析',
-    description: 'AI 自动分析商品特征，结合你选择的视频风格，生成专业级提示词。',
-    detail: '5 秒内完成，10 大模块全覆盖',
+    icon: FileCheck2,
+    title: '生成拍摄方案',
+    description: 'AI 输出视频定位、镜头调度、场景、动作、声音和技术参数。',
   },
   {
     icon: Copy,
-    step: '03',
-    title: '复制使用',
-    description: '一键复制生成的提示词，粘贴到 Runway、Pika、Sora 等 AI 视频工具中使用。',
-    detail: '适配主流 AI 视频生成工具',
+    title: '复制到视频工具',
+    description: '直接用于 Runway、Pika、Sora、Kling 等视频生成工具。',
   },
 ]
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-50 border border-cyan-100 mb-4">
-            <span className="text-sm text-cyan-700 font-medium">简单三步</span>
+    <section id="workflow" className="bg-[#f7f8fb] py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div>
+            <p className="text-sm font-semibold text-[#0f9f7a]">工作流程</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-gray-950 sm:text-4xl">
+              从商品到视频，只保留必要步骤
+            </h2>
+            <p className="mt-4 text-base leading-7 text-gray-600">
+              设计重点不是炫技，而是让运营人员第一次打开也知道下一步该做什么。
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            如何使用 <span className="gradient-text">PromptReel</span>
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            无需专业知识，三步即可获得专业级 AI 视频提示词
-          </p>
-        </div>
 
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => {
-            const Icon = step.icon
-            return (
-              <div key={step.step} className="relative">
-                {/* Connector Line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-16 left-1/2 w-full h-0.5 bg-gradient-to-r from-indigo-200 to-cyan-200" />
-                )}
-
-                <div className="relative bg-white rounded-2xl p-8 border border-gray-100 text-center card-hover">
-                  {/* Step Number */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full animated-gradient flex items-center justify-center text-white text-sm font-bold">
-                    {step.step}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {steps.map((step, index) => {
+              const Icon = step.icon
+              return (
+                <div key={step.title} className="surface rounded-2xl bg-white p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-950">
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-300">0{index + 1}</span>
                   </div>
-
-                  {/* Icon */}
-                  <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-cyan-50 flex items-center justify-center">
-                    <Icon className="w-8 h-8 text-indigo-600" />
-                  </div>
-
-                  <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">{step.description}</p>
-                  <p className="text-xs text-gray-400">{step.detail}</p>
+                  <h3 className="mt-6 text-lg font-semibold text-gray-950">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-gray-600">{step.description}</p>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>

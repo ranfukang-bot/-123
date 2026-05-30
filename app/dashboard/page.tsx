@@ -217,25 +217,24 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">AI 视频提示词生成</h1>
-          <p className="text-gray-500 mt-1">上传商品图片，一键生成专业级视频提示词</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-950">生成视频提示词</h1>
+          <p className="text-gray-500 mt-1">上传商品图，输出可直接用于 AI 视频工具的结构化方案</p>
         </div>
         {credits !== null && (
-          <div className="bg-white px-4 py-2 rounded-full border border-gray-100 text-sm">
+          <div className="bg-white px-4 py-2 rounded-xl border border-gray-200 text-sm shadow-sm">
             <span className="text-gray-500">剩余次数：</span>
-            <span className="font-semibold gradient-text">{credits}</span>
+            <span className="font-semibold text-[#2454d6]">{credits}</span>
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left: Input */}
-        <div className="space-y-6">
+        <div className="surface space-y-6 rounded-2xl bg-white p-6">
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium mb-2">商品图片</label>
             {imagePreview ? (
-              <div className="relative h-64 rounded-xl overflow-hidden border border-gray-200">
+              <div className="relative h-72 rounded-xl overflow-hidden border border-gray-200">
                 <Image
                   src={imagePreview}
                   alt="商品图片预览"
@@ -253,10 +252,10 @@ export default function DashboardPage() {
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 transition-all"
+                className="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center cursor-pointer hover:border-[#2454d6] hover:bg-blue-50/40 transition-all"
               >
-                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-indigo-50 flex items-center justify-center">
-                  <Upload className="w-6 h-6 text-indigo-500" />
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-950 flex items-center justify-center">
+                  <Upload className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-sm text-gray-600 mb-1">点击或拖拽上传商品图片</p>
                 <p className="text-xs text-gray-400">支持 JPG、PNG、WebP，最大 10MB</p>
@@ -279,7 +278,7 @@ export default function DashboardPage() {
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               placeholder="例如：假两件拼接连帽夹克"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2454d6] focus:border-transparent bg-white"
             />
           </div>
 
@@ -289,7 +288,7 @@ export default function DashboardPage() {
             <select
               value={videoType}
               onChange={(e) => setVideoType(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2454d6] focus:border-transparent bg-white"
             >
               <option value="">选择视频类型</option>
               {VIDEO_TYPES.map((type) => (
@@ -306,7 +305,7 @@ export default function DashboardPage() {
             <select
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2454d6] focus:border-transparent bg-white"
             >
               <option value="">选择平台</option>
               {PLATFORMS.map((p) => (
@@ -325,7 +324,7 @@ export default function DashboardPage() {
               onChange={(e) => setExtraRequirements(e.target.value)}
               placeholder="描述你希望突出的卖点、风格偏好、目标受众等..."
               rows={3}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2454d6] focus:border-transparent resize-none bg-white"
             />
           </div>
 
@@ -340,7 +339,7 @@ export default function DashboardPage() {
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="w-full gradient-btn text-white font-medium py-3.5 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full gradient-btn text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -356,10 +355,9 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Right: Output */}
-        <div>
+        <div className="surface rounded-2xl bg-white p-6">
           <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium">生成结果</label>
+            <label className="text-sm font-semibold text-gray-950">生成结果</label>
             {result && (
               <button
                 onClick={handleCopy}
@@ -381,7 +379,7 @@ export default function DashboardPage() {
           </div>
 
           {result ? (
-            <div className="bg-white rounded-xl border border-gray-100 p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+            <div className="rounded-xl border border-gray-200 bg-[#fbfcfe] p-4 max-h-[calc(100vh-210px)] overflow-y-auto">
               {modules.length > 0 ? (
                 <div className="space-y-4">
                   {modules.map((module, index) => (
@@ -400,7 +398,7 @@ export default function DashboardPage() {
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+            <div className="rounded-xl border border-dashed border-gray-200 bg-[#fbfcfe] p-12 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-50 flex items-center justify-center">
                 <ImageIcon className="w-8 h-8 text-gray-300" />
               </div>

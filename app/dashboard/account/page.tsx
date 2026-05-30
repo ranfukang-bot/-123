@@ -79,15 +79,15 @@ export default function AccountPage() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">账户管理</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-950">账户管理</h1>
         <p className="text-gray-500 mt-1">管理你的账户信息和套餐</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="surface rounded-2xl bg-white p-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-gray-950 flex items-center justify-center">
               <User className="w-7 h-7 text-white" />
             </div>
             <div>
@@ -126,7 +126,7 @@ export default function AccountPage() {
         </div>
 
         {/* Usage Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="surface rounded-2xl bg-white p-6">
           <h3 className="font-semibold mb-6">使用情况</h3>
 
           <div className="mb-6">
@@ -144,9 +144,9 @@ export default function AccountPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-indigo-50 to-cyan-50 rounded-xl p-4 mb-6">
+          <div className="bg-[#f7f8fb] border border-gray-200 rounded-xl p-4 mb-6">
             <div className="text-sm text-gray-600 mb-1">剩余次数</div>
-            <div className="text-3xl font-bold gradient-text">{profile.credits_remaining}</div>
+            <div className="text-3xl font-semibold text-[#2454d6]">{profile.credits_remaining}</div>
           </div>
 
           {profile.plan_type !== 'unlimited' && (

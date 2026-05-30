@@ -267,14 +267,22 @@ export default function RegisterPage() {
   // 验证码输入步骤
   if (step === 'verify') {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl" />
+      <div className="min-h-screen bg-[#f7f8fb] px-4 py-10">
+        <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="hidden lg:block">
+            <p className="text-sm font-semibold text-[#2454d6]">邮箱验证</p>
+            <h2 className="mt-4 max-w-md text-4xl font-semibold leading-tight tracking-tight text-gray-950">
+              用验证码完成注册，保护每一个真实账号
+            </h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-gray-600">
+              注册后获得 3 次完整生成额度。正式上线版本会接入自定义 SMTP，保证国内邮箱收信稳定。
+            </p>
+          </div>
 
-        <div className="relative w-full max-w-md">
+          <div className="mx-auto w-full max-w-md min-w-0 justify-self-center">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl animated-gradient flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gray-950 flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold gradient-text">PromptReel</span>
@@ -285,7 +293,7 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+          <div className="surface rounded-2xl bg-white p-6 sm:p-8">
             <form onSubmit={handleVerify} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium mb-2">输入 6 位验证码</label>
@@ -313,7 +321,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading || otpCode.length !== 6}
-                className="w-full gradient-btn text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full gradient-btn text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -348,19 +356,32 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      </div>
     )
   }
 
   // 注册表单步骤
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-[#f7f8fb] px-4 py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="hidden lg:block">
+          <p className="text-sm font-semibold text-[#2454d6]">PromptReel</p>
+          <h2 className="mt-4 max-w-md text-4xl font-semibold leading-tight tracking-tight text-gray-950">
+            把商品图变成可交付的视频创作方案
+          </h2>
+          <div className="mt-8 space-y-3 text-sm text-gray-600">
+            {['结构化提示词输出', '注册送 3 次完整体验', '适合带货团队批量出片'].map((item) => (
+              <div key={item} className="rounded-xl border border-gray-200 bg-white px-4 py-3">
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <div className="relative w-full max-w-md">
+        <div className="mx-auto w-full max-w-md min-w-0 justify-self-center">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl animated-gradient flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gray-950 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-bold gradient-text">PromptReel</span>
@@ -369,7 +390,7 @@ export default function RegisterPage() {
           <p className="text-gray-500 mt-1">注册即可获得 3 次免费体验</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+        <div className="surface rounded-2xl bg-white p-6 sm:p-8">
           <form onSubmit={handleRegister} className="space-y-5">
             <div>
               <label className="block text-sm font-medium mb-2">邮箱</label>
@@ -417,7 +438,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full gradient-btn text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full gradient-btn text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -436,6 +457,7 @@ export default function RegisterPage() {
               立即登录
             </Link>
           </div>
+        </div>
         </div>
       </div>
     </div>

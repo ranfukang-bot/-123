@@ -4,74 +4,42 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Landing/Navbar'
 import Footer from '@/components/Landing/Footer'
-import { Check, Sparkles, Loader2 } from 'lucide-react'
+import { Check, Loader2, Sparkles } from 'lucide-react'
 import { getAccessToken } from '@/lib/client-auth'
 
 const plans = [
   {
     name: '免费体验',
     price: '¥0',
-    period: '',
-    description: '先试试看效果',
-    credits: '3 次/月',
+    description: '适合先验证生成质量',
+    credits: '3 次',
     planKey: 'free',
-    features: [
-      '基础视频提示词生成',
-      '支持 5 种视频风格',
-      '10 大模块完整输出',
-      '一键复制功能',
-    ],
-    popular: false,
+    features: ['完整提示词生成', '支持 5 种视频类型', '历史记录保存', '一键复制'],
   },
   {
     name: '基础版',
     price: '¥29',
-    period: '/月',
     description: '适合个人带货博主',
     credits: '50 次/月',
     planKey: 'basic',
-    features: [
-      '全部免费版功能',
-      '优先响应速度',
-      '历史记录保存',
-      '商品类型智能识别',
-      '多平台适配建议',
-    ],
-    popular: false,
+    features: ['全部免费版功能', '优先响应速度', '商品类型智能识别', '多平台适配建议'],
   },
   {
     name: '专业版',
     price: '¥69',
-    period: '/月',
     description: '适合专业 MCN 机构',
     credits: '200 次/月',
     planKey: 'pro',
-    features: [
-      '全部基础版功能',
-      '最高优先级响应',
-      '批量生成支持',
-      '专属客服支持',
-      '高级分镜脚本',
-      '定制化风格模板',
-    ],
+    features: ['全部基础版功能', '最高优先级响应', '高级分镜脚本', '专属客服支持'],
     popular: true,
   },
   {
     name: '无限版',
     price: '¥129',
-    period: '/月',
-    description: '无限量使用',
+    description: '适合批量测试团队',
     credits: '不限次数',
     planKey: 'unlimited',
-    features: [
-      '全部专业版功能',
-      '无限次生成',
-      '开放接口调用（API）',
-      '专属培训服务',
-      '优先体验新功能',
-      '定制化需求响应',
-    ],
-    popular: false,
+    features: ['全部专业版功能', '无限次生成', '开放接口调用（API）', '优先体验新功能'],
   },
 ]
 
@@ -120,56 +88,45 @@ export default function PricingPage() {
   return (
     <>
       <Navbar />
-      <main className="pt-32 pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 mb-4">
-              <span className="text-sm text-purple-700 font-medium">灵活定价</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              选择适合你的 <span className="gradient-text">套餐</span>
+      <main className="bg-[#f7f8fb] pt-28">
+        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold text-[#2454d6]">价格方案</p>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-gray-950 sm:text-5xl">
+              按生成规模选择套餐
             </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              从免费体验到无限使用，满足不同规模的带货视频创作需求
+            <p className="mt-5 text-base leading-7 text-gray-600">
+              先用免费次数验证效果，再根据账号数量、素材量和团队节奏升级。正式收费前会完成支付、发信和国内部署验收。
             </p>
           </div>
 
-          {/* Pricing Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative bg-white rounded-2xl border ${
-                  plan.popular
-                    ? 'border-indigo-200 shadow-lg shadow-indigo-100'
-                    : 'border-gray-100'
-                } p-6 card-hover`}
+                className={`relative rounded-2xl border p-6 ${
+                  plan.popular ? 'border-gray-950 bg-gray-950 text-white shadow-xl' : 'border-gray-200 bg-white text-gray-950'
+                }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <div className="flex items-center gap-1 px-3 py-1 rounded-full animated-gradient text-white text-xs font-medium">
-                      <Sparkles className="w-3 h-3" />
-                      最受欢迎
-                    </div>
+                  <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    推荐
                   </div>
                 )}
-
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-1">{plan.name}</h3>
-                  <p className="text-sm text-gray-500 mb-4">{plan.description}</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold gradient-text">{plan.price}</span>
-                    <span className="text-gray-500 text-sm">{plan.period}</span>
-                  </div>
-                  <div className="mt-2 text-sm text-indigo-600 font-medium">{plan.credits}</div>
+                <h3 className="text-lg font-semibold">{plan.name}</h3>
+                <p className={`mt-2 text-sm ${plan.popular ? 'text-gray-300' : 'text-gray-500'}`}>{plan.description}</p>
+                <div className="mt-6">
+                  <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
+                  {plan.planKey !== 'free' && <span className={`text-sm ${plan.popular ? 'text-gray-300' : 'text-gray-500'}`}> / 月</span>}
                 </div>
+                <p className={`mt-2 text-sm font-semibold ${plan.popular ? 'text-white' : 'text-[#2454d6]'}`}>{plan.credits}</p>
 
-                <ul className="space-y-3 mb-8">
+                <ul className="mt-6 space-y-3">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm">
-                      <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                      <span className="text-gray-600">{feature}</span>
+                    <li key={feature} className={`flex items-start gap-2 text-sm ${plan.popular ? 'text-gray-200' : 'text-gray-600'}`}>
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#0f9f7a]" />
+                      {feature}
                     </li>
                   ))}
                 </ul>
@@ -177,54 +134,30 @@ export default function PricingPage() {
                 <button
                   onClick={() => handleSubscribe(plan.planKey)}
                   disabled={loading === plan.planKey}
-                  className={`w-full py-2.5 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                    plan.popular
-                      ? 'gradient-btn text-white'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  className={`mt-8 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold ${
+                    plan.popular ? 'bg-white text-gray-950 hover:bg-gray-100' : 'border border-gray-300 bg-white text-gray-800 hover:border-gray-400'
                   } disabled:opacity-50`}
                 >
-                  {loading === plan.planKey ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : plan.planKey === 'free' ? (
-                    '免费开始'
-                  ) : (
-                    '立即订阅'
-                  )}
+                  {loading === plan.planKey ? <Loader2 className="h-4 w-4 animate-spin" /> : plan.planKey === 'free' ? '免费开始' : '立即订阅'}
                 </button>
               </div>
             ))}
           </div>
 
-          {/* FAQ */}
-          <div className="mt-24 max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-12">常见问题</h2>
-            <div className="space-y-6">
-              {[
-                {
-                  q: '免费体验有什么限制？',
-                  a: '注册后即可获得 3 次免费生成机会，可以体验全部功能。用完后需要升级套餐继续使用。',
-                },
-                {
-                  q: '支持哪些支付方式？',
-                  a: '支持支付宝、信用卡等主流支付方式，通过安全的第三方支付平台处理。',
-                },
-                {
-                  q: '可以随时取消订阅吗？',
-                  a: '可以，随时可以在账户管理中取消订阅。取消后当前周期内仍可正常使用。',
-                },
-                {
-                  q: '生成的提示词可以用在哪些工具上？',
-                  a: '支持 Runway、Pika、Sora、Kling 等主流 AI 视频生成工具，描述格式通用。',
-                },
-              ].map((faq) => (
-                <div key={faq.q} className="bg-white rounded-xl border border-gray-100 p-6">
-                  <h3 className="font-semibold mb-2">{faq.q}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
-                </div>
-              ))}
-            </div>
+          <div className="mt-16 grid gap-4 md:grid-cols-2">
+            {[
+              ['免费体验有什么限制？', '注册后获得 3 次完整生成机会，用完后需要升级套餐继续使用。'],
+              ['生成结果能用于哪些工具？', '适配 Runway、Pika、Sora、Kling 等主流 AI 视频生成工具。'],
+              ['可以随时取消订阅吗？', '可以。取消后当前周期内仍可正常使用，后续不再续费。'],
+              ['国内用户能稳定使用吗？', '正式版会迁移到国内部署，并通过服务端代理减少海外直连。'],
+            ].map(([q, a]) => (
+              <div key={q} className="surface rounded-2xl bg-white p-6">
+                <h3 className="font-semibold text-gray-950">{q}</h3>
+                <p className="mt-2 text-sm leading-6 text-gray-600">{a}</p>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
       </main>
       <Footer />
     </>

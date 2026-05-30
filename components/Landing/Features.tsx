@@ -1,75 +1,62 @@
-import { Camera, Palette, FileText, Zap, Shield, Layers } from 'lucide-react'
+import { Camera, FileText, Gauge, Layers, ShieldCheck, Users } from 'lucide-react'
 
 const features = [
   {
     icon: Camera,
-    title: '智能图片分析',
-    description: '上传商品图片，AI 自动识别商品类型、材质、颜色等关键特征，精准理解商品卖点。',
-    color: 'from-indigo-500 to-purple-500',
+    title: '商品图智能拆解',
+    description: '识别商品品类、材质、颜色、使用场景和可传播卖点，减少人工写脚本的前置时间。',
   },
   {
     icon: FileText,
-    title: '10 大模块输出',
-    description: '严格按照视频类型、画面风格、场景环境、镜头语言等十大模块生成结构化提示词，专业完整。',
-    color: 'from-purple-500 to-pink-500',
-  },
-  {
-    icon: Palette,
-    title: '多风格支持',
-    description: '支持 Vlog 种草、产品展示、生活方式纪录片、快节奏卡点、ASMR 等多种视频风格。',
-    color: 'from-pink-500 to-red-500',
+    title: '结构化提示词',
+    description: '按视频定位、镜头、场景、光线、动作、声音和避雷说明输出，团队可以直接复用。',
   },
   {
     icon: Layers,
-    title: '商品类型覆盖',
-    description: '服装、美妆、数码、家居、食品等主流商品类型全覆盖，内置最佳实践模板。',
-    color: 'from-cyan-500 to-blue-500',
+    title: '多平台创作视角',
+    description: '支持抖音、小红书、快手、视频号等平台语境，让同一商品能快速生成不同风格。',
   },
   {
-    icon: Zap,
-    title: '极速生成',
-    description: '5 秒内完成分析和生成，无需等待。支持一键复制，直接粘贴到 AI 视频工具使用。',
-    color: 'from-amber-500 to-orange-500',
+    icon: Gauge,
+    title: '节省试错成本',
+    description: '把含糊的想法变成可执行描述，减少 AI 视频工具反复试错和低质量出片。',
   },
   {
-    icon: Shield,
-    title: '专业可执行',
-    description: '使用专业摄影术语，描述清晰具体，确保 Runway、Pika、Sora 等工具能够准确理解并生成。',
-    color: 'from-green-500 to-emerald-500',
+    icon: Users,
+    title: '适合团队协作',
+    description: '历史记录保留每次生成结果，运营、剪辑、投手可以围绕同一份提示词推进。',
+  },
+  {
+    icon: ShieldCheck,
+    title: '服务端保护核心提示词',
+    description: '系统提示词只在服务端注入，用户拿到的是结果，不暴露你的核心方法论。',
   },
 ]
 
 export default function Features() {
   return (
-    <section id="features" className="py-24 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 mb-4">
-            <span className="text-sm text-indigo-700 font-medium">核心功能</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            为什么选择 <span className="gradient-text">PromptReel</span>
+    <section id="features" className="border-y border-gray-200 bg-white py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold text-[#2454d6]">核心能力</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-gray-950 sm:text-4xl">
+            不是写几句漂亮话，而是输出能落地的创作方案
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            从商品图片到专业视频提示词，一站式解决你的带货视频创作需求
+          <p className="mt-4 text-base leading-7 text-gray-600">
+            正式上线的工具要让用户少想一步。PromptReel 把商品信息、平台语境和 AI 视频生成经验整理成可复用流程。
           </p>
         </div>
 
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <div
-                key={feature.title}
-                className="card-hover bg-white rounded-2xl p-6 border border-gray-100"
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
-                  <Icon className="w-6 h-6 text-white" />
+              <div key={feature.title} className="card-hover rounded-2xl border border-gray-200 bg-[#fbfcfe] p-6">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm">
+                  <Icon className="h-5 w-5 text-[#2454d6]" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="mt-5 text-lg font-semibold text-gray-950">{feature.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-gray-600">{feature.description}</p>
               </div>
             )
           })}

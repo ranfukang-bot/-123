@@ -47,20 +47,20 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50/50">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-gray-100 flex md:flex-col shrink-0">
-        {/* Logo */}
-        <div className="p-4 md:p-6 md:border-b border-gray-100 shrink-0">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#f7f8fb]">
+      <aside className="w-full md:w-68 bg-[#0b1220] text-white flex md:flex-col shrink-0">
+        <div className="p-4 md:p-6 md:border-b border-white/10 shrink-0">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg animated-gradient flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-[#111827]" />
             </div>
-            <span className="text-lg font-bold gradient-text">PromptReel</span>
+            <div>
+              <span className="block text-lg font-semibold text-white">PromptReel</span>
+              <span className="hidden text-xs text-white/50 md:block">创作工作台</span>
+            </div>
           </Link>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 p-2 md:p-4 flex md:block gap-1 md:space-y-1 overflow-x-auto">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -71,8 +71,8 @@ export default function DashboardLayout({
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-white text-gray-950'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -83,7 +83,7 @@ export default function DashboardLayout({
 
           <Link
             href="/dashboard/account"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-all"
           >
             <CreditCard className="w-5 h-5" />
             <span className="whitespace-nowrap">套餐升级</span>
@@ -91,10 +91,10 @@ export default function DashboardLayout({
         </nav>
 
         {/* Logout */}
-        <div className="p-2 md:p-4 md:border-t border-gray-100">
+        <div className="p-2 md:p-4 md:border-t border-white/10">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all w-full"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white transition-all w-full"
           >
             <LogOut className="w-5 h-5" />
             <span className="hidden lg:inline whitespace-nowrap">退出登录</span>
