@@ -1,10 +1,24 @@
 import OpenAI from 'openai'
 import { SYSTEM_PROMPT, buildUserMessage } from './prompts/system'
 
-const openai = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-  baseURL: process.env.GEMINI_BASE_URL || 'https://yunwu.ai/v1',
-})
+let openai: OpenAI | null = null
+
+function getOpenAIClient() {
+  const apiKey = process.env.GEMINI_API_KEY
+
+  if (!apiKey) {
+    throw new Error('AI 服务尚未配置，请先补充 GEMINI_API_KEY')
+  }
+
+  if (!openai) {
+    openai = new OpenAI({
+      apiKey,
+      baseURL: process.env.GEMINI_BASE_URL || 'https://yunwu.ai/v1',
+    })
+  }
+
+  return openai
+}
 
 interface GenerateParams {
   productName: string
@@ -33,7 +47,7 @@ export async function generateVideoPrompt(params: GenerateParams) {
 
   content.push({ type: 'text', text: userMessage })
 
-  const completion = await openai.chat.completions.create({
+  const completion = await getOpenAIClient().chat.completions.create({
     model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
