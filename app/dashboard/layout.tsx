@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Sparkles, Wand2, History, User, LogOut, CreditCard } from 'lucide-react'
@@ -13,6 +13,14 @@ const navItems = [
   { href: '/dashboard/account', label: '账户管理', icon: User },
 ]
 
+const subscribeToSession = (callback: () => void) => {
+  window.addEventListener('storage', callback)
+  return () => window.removeEventListener('storage', callback)
+}
+
+const getSessionSnapshot = () => Boolean(getAccessToken())
+const getServerSessionSnapshot = () => null
+
 export default function DashboardLayout({
   children,
 }: {
@@ -20,12 +28,14 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [hasSession] = useState(() =>
-    typeof window === 'undefined' ? false : Boolean(getAccessToken())
+  const hasSession = useSyncExternalStore(
+    subscribeToSession,
+    getSessionSnapshot,
+    getServerSessionSnapshot
   )
 
   useEffect(() => {
-    if (!hasSession) {
+    if (hasSession === false) {
       router.replace('/login')
     }
   }, [hasSession, router])
@@ -35,7 +45,7 @@ export default function DashboardLayout({
     router.push('/')
   }
 
-  if (!hasSession) {
+  if (hasSession !== true) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
         <div className="text-center">
