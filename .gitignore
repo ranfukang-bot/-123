@@ -24,6 +24,7 @@
 .DS_Store
 *.pem
 tmp-*.png
+视频素材/
 
 # debug
 npm-debug.log*

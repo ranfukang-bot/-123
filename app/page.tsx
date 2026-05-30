@@ -1,5 +1,6 @@
 import Navbar from '@/components/Landing/Navbar'
 import Hero from '@/components/Landing/Hero'
+import Showcase from '@/components/Landing/Showcase'
 import Features from '@/components/Landing/Features'
 import HowItWorks from '@/components/Landing/HowItWorks'
 import Pricing from '@/components/Landing/Pricing'
@@ -11,6 +12,7 @@ export default function HomePage() {
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <Showcase />
         <Features />
         <HowItWorks />
         <Pricing />

@@ -48,6 +48,17 @@ body {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   box-shadow: 0 10px 24px rgba(36, 84, 214, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
 }
 
 .gradient-btn:hover {
@@ -55,8 +66,12 @@ body {
   box-shadow: 0 14px 30px rgba(36, 84, 214, 0.26);
 }
 
+.gradient-btn:hover::after {
+  transform: translateX(120%);
+}
+
 .gradient-btn:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 .glass {
@@ -96,4 +111,123 @@ body {
   background: var(--panel);
   border: 1px solid var(--line);
   box-shadow: 0 12px 32px rgba(16, 24, 40, 0.06);
+}
+
+.button-pop {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.button-pop:hover {
+  transform: translateY(-2px);
+}
+
+.button-pop:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.hero-scanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(142, 232, 255, 0.1), transparent);
+  height: 32%;
+  animation: scanline 7s ease-in-out infinite;
+}
+
+.creative-stage::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgba(142, 232, 255, 0.28), transparent),
+    linear-gradient(180deg, transparent, rgba(54, 240, 170, 0.16), transparent);
+  opacity: 0.55;
+}
+
+.product-glow {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    radial-gradient(circle at 50% 15%, rgba(250, 204, 21, 0.24), transparent 32%);
+  animation: productFloat 5s ease-in-out infinite;
+}
+
+.progress-flow {
+  animation: progressFlow 2.8s ease-in-out infinite;
+}
+
+.prompt-flow-card {
+  animation: promptPulse 3.2s ease-in-out infinite;
+}
+
+.fallback-reel {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 40%),
+    repeating-linear-gradient(110deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 14px);
+  animation: reelDrift 6s ease-in-out infinite;
+}
+
+@keyframes scanline {
+  0%, 100% {
+    transform: translateY(-40%);
+    opacity: 0;
+  }
+  45%, 55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(260%);
+  }
+}
+
+@keyframes productFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes progressFlow {
+  0%, 100% {
+    width: 28%;
+    transform: translateX(0);
+  }
+  50% {
+    width: 92%;
+    transform: translateX(4%);
+  }
+}
+
+@keyframes promptPulse {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 rgba(36, 84, 214, 0);
+  }
+  50% {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(36, 84, 214, 0.08);
+  }
+}
+
+@keyframes reelDrift {
+  0%, 100% {
+    transform: scale(1);
+    filter: saturate(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: saturate(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scanline,
+  .product-glow,
+  .progress-flow,
+  .prompt-flow-card,
+  .fallback-reel {
+    animation: none;
+  }
 }
