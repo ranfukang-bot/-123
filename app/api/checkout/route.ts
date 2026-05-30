@@ -20,8 +20,15 @@ export async function POST(request: NextRequest) {
     // Get plan from body
     const { plan } = await request.json()
 
-    if (!plan || !PLAN_VARIANTS[plan]) {
+    if (!plan || !(plan in PLAN_VARIANTS)) {
       return NextResponse.json({ error: '无效的套餐' }, { status: 400 })
+    }
+
+    if (!PLAN_VARIANTS[plan]) {
+      return NextResponse.json(
+        { error: '该套餐暂未配置支付 ID，请先补充 LemonSqueezy Variant ID' },
+        { status: 503 }
+      )
     }
 
     // Create checkout
