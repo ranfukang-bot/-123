@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { withClientTimeout } from '@/lib/client-timeout'
 
 const PENDING_SIGNUP_EMAIL_KEY = 'promptreel_pending_signup_email'
 const PENDING_SIGNUP_UNLOCK_AT_KEY = 'promptreel_pending_signup_unlock_at'
@@ -143,41 +144,46 @@ export default function RegisterPage() {
     setError('')
     const normalizedEmail = email.trim().toLowerCase()
 
-    if (password.length < 6) {
-      setError('密码至少需要 6 个字符')
-      setLoading(false)
-      return
-    }
-
-    // 注册账号。Supabase 会发送 signup 验证码，避免再调用 signInWithOtp 触发限流。
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: normalizedEmail,
-      password,
-    })
-
-    if (signUpError) {
-      if (isRateLimitError(signUpError.message)) {
-        const seconds = getRateLimitSeconds(signUpError.message)
-        setEmail(normalizedEmail)
-        savePendingSignup(normalizedEmail, seconds)
-        setStep('verify')
-        startCountdown(seconds)
-        setError('验证码发送太频繁，请先不要反复点击。若刚才已经收到邮件，请直接输入邮件里的验证码。')
-        setLoading(false)
+    try {
+      if (password.length < 6) {
+        setError('密码至少需要 6 个字符')
         return
       }
 
-      setError(getFriendlyAuthError(signUpError.message))
-      setLoading(false)
-      return
-    }
+      // 注册账号。Supabase 会发送 signup 验证码，避免再调用 signInWithOtp 触发限流。
+      const { error: signUpError } = await withClientTimeout(
+        supabase.auth.signUp({
+          email: normalizedEmail,
+          password,
+        }),
+        '注册请求超时。当前网络可能无法连接认证服务，请稍后重试。'
+      )
 
-    // 进入验证码输入步骤
-    setEmail(normalizedEmail)
-    savePendingSignup(normalizedEmail, 60)
-    setStep('verify')
-    setLoading(false)
-    startCountdown(60)
+      if (signUpError) {
+        if (isRateLimitError(signUpError.message)) {
+          const seconds = getRateLimitSeconds(signUpError.message)
+          setEmail(normalizedEmail)
+          savePendingSignup(normalizedEmail, seconds)
+          setStep('verify')
+          startCountdown(seconds)
+          setError('验证码发送太频繁，请先不要反复点击。若刚才已经收到邮件，请直接输入邮件里的验证码。')
+          return
+        }
+
+        setError(getFriendlyAuthError(signUpError.message))
+        return
+      }
+
+      // 进入验证码输入步骤
+      setEmail(normalizedEmail)
+      savePendingSignup(normalizedEmail, 60)
+      setStep('verify')
+      startCountdown(60)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '注册失败，请稍后重试')
+    } finally {
+      setLoading(false)
+    }
   }
 
   // 重新发送验证码
@@ -187,23 +193,31 @@ export default function RegisterPage() {
     setError('')
     const normalizedEmail = email.trim().toLowerCase()
 
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: normalizedEmail,
-    })
+    try {
+      const { error } = await withClientTimeout(
+        supabase.auth.resend({
+          type: 'signup',
+          email: normalizedEmail,
+        }),
+        '验证码发送请求超时，请稍后重试。'
+      )
 
-    if (error) {
-      if (isRateLimitError(error.message)) {
-        const seconds = getRateLimitSeconds(error.message)
-        savePendingSignup(normalizedEmail, seconds)
-        startCountdown(seconds)
+      if (error) {
+        if (isRateLimitError(error.message)) {
+          const seconds = getRateLimitSeconds(error.message)
+          savePendingSignup(normalizedEmail, seconds)
+          startCountdown(seconds)
+        }
+        setError('发送失败：' + getFriendlyAuthError(error.message))
+      } else {
+        savePendingSignup(normalizedEmail, 60)
+        startCountdown(60)
       }
-      setError('发送失败：' + getFriendlyAuthError(error.message))
-    } else {
-      savePendingSignup(normalizedEmail, 60)
-      startCountdown(60)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '发送失败，请稍后重试')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   // 第二步：验证验证码
@@ -212,27 +226,34 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
-    if (otpCode.length !== 6) {
-      setError('请输入 6 位验证码')
+    try {
+      if (otpCode.length !== 6) {
+        setError('请输入 6 位验证码')
+        return
+      }
+
+      const { error } = await withClientTimeout(
+        supabase.auth.verifyOtp({
+          email,
+          token: otpCode,
+          type: 'signup',
+        }),
+        '验证码验证请求超时，请稍后重试。'
+      )
+
+      if (error) {
+        setError('验证码错误或已过期')
+        return
+      }
+
+      // 验证成功，跳转到工作台
+      clearPendingSignup()
+      router.push('/dashboard')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '验证失败，请稍后重试')
+    } finally {
       setLoading(false)
-      return
     }
-
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: otpCode,
-      type: 'signup',
-    })
-
-    if (error) {
-      setError('验证码错误或已过期')
-      setLoading(false)
-      return
-    }
-
-    // 验证成功，跳转到工作台
-    clearPendingSignup()
-    router.push('/dashboard')
   }
 
   // 验证码输入步骤

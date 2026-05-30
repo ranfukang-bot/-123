@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { withClientTimeout } from '@/lib/client-timeout'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -37,18 +38,26 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await withClientTimeout(
+        supabase.auth.signInWithPassword({
+          email,
+          password,
+        }),
+        '登录请求超时。当前网络可能无法连接认证服务，请稍后重试。'
+      )
 
-    if (error) {
-      setError(getFriendlyAuthError(error.message))
+      if (error) {
+        setError(getFriendlyAuthError(error.message))
+        return
+      }
+
+      router.push('/dashboard')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '登录失败，请稍后重试')
+    } finally {
       setLoading(false)
-      return
     }
-
-    router.push('/dashboard')
   }
 
   // 发送重置密码邮件
@@ -57,18 +66,25 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    })
+    try {
+      const { error } = await withClientTimeout(
+        supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/login`,
+        }),
+        '重置邮件发送请求超时，请稍后重试。'
+      )
 
-    if (error) {
-      setError(getFriendlyAuthError(error.message))
+      if (error) {
+        setError(getFriendlyAuthError(error.message))
+        return
+      }
+
+      setMode('reset-sent')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '发送失败，请稍后重试')
+    } finally {
       setLoading(false)
-      return
     }
-
-    setMode('reset-sent')
-    setLoading(false)
   }
 
   // 忘记密码 - 已发送页面
