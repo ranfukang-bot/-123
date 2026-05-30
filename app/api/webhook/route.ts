@@ -27,8 +27,8 @@ interface LemonSqueezyWebhookPayload {
 function verifyWebhookSignature(body: string, signature: string, secret: string): boolean {
   const hmac = crypto.createHmac('sha256', secret)
   const digest = hmac.update(body).digest('hex')
-  const signatureBuffer = Buffer.from(signature, 'hex')
-  const digestBuffer = Buffer.from(digest, 'hex')
+  const signatureBuffer = Buffer.from(signature, 'utf8')
+  const digestBuffer = Buffer.from(digest, 'utf8')
 
   if (signatureBuffer.length !== digestBuffer.length) {
     return false

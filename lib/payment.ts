@@ -42,8 +42,12 @@ export async function createCheckout({ variantId, userId, userEmail }: CreateChe
               user_id: userId,
             },
           },
+          checkout_options: {
+            locale: 'zh-CN',
+          },
           product_options: {
             redirect_url: `${appUrl || 'http://localhost:3000'}/dashboard/account`,
+            enabled_variants: [Number(variantId)],
           },
         },
         relationships: {

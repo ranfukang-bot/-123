@@ -41,4 +41,6 @@ npm run check:prod
 
 ## Deploy
 
-Vercel is the recommended target for this Next.js app. Use `npm run build` as the build command.
+For China-facing production, do not use Vercel as the final host. Deploy the Dockerfile build to a China-accessible container host such as Tencent CloudBase Run, then bind `https://www.daihuo.icu`.
+
+Detailed launch steps are in [`CHINA_LAUNCH_GUIDE.md`](./CHINA_LAUNCH_GUIDE.md).

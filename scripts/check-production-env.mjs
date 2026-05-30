@@ -46,4 +46,39 @@ if (!/^https:\/\//.test(appUrl)) {
   process.exit(1)
 }
 
+if (appUrl.includes('your-domain.com') || appUrl.includes('localhost')) {
+  console.error('NEXT_PUBLIC_APP_URL is still a placeholder/local URL.')
+  process.exit(1)
+}
+
+if (appUrl.includes('vercel.app')) {
+  console.error('NEXT_PUBLIC_APP_URL points to vercel.app. For China production, use the official domain on a China-accessible host.')
+  process.exit(1)
+}
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(supabaseUrl)) {
+  console.error('NEXT_PUBLIC_SUPABASE_URL must look like https://project-ref.supabase.co.')
+  process.exit(1)
+}
+
+const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET
+if (webhookSecret.length < 6 || webhookSecret.length > 40) {
+  console.error('LEMONSQUEEZY_WEBHOOK_SECRET must be 6-40 characters.')
+  process.exit(1)
+}
+
+const variantIds = [
+  'LEMONSQUEEZY_BASIC_VARIANT_ID',
+  'LEMONSQUEEZY_PRO_VARIANT_ID',
+  'LEMONSQUEEZY_UNLIMITED_VARIANT_ID',
+]
+
+for (const name of variantIds) {
+  if (!/^\d+$/.test(process.env[name])) {
+    console.error(`${name} must be a numeric LemonSqueezy Variant ID.`)
+    process.exit(1)
+  }
+}
+
 console.log('Production environment looks complete.')
