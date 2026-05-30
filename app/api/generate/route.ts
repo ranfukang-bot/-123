@@ -38,6 +38,24 @@ function jsonError(error: string, status: number, code?: string) {
   return NextResponse.json(code ? { error, code } : { error }, { status })
 }
 
+function getFriendlyServerError(error: unknown) {
+  const message = error instanceof Error ? error.message : ''
+
+  if (
+    message.includes('Maximum call stack size exceeded') ||
+    message.includes('Unable to process input image') ||
+    message.includes('input image')
+  ) {
+    return '图片处理失败。请换一张更清晰的 JPG/PNG 图片，或先截图/压缩后再上传。'
+  }
+
+  if (message.includes('429')) {
+    return 'AI 服务当前繁忙，请稍后再试。'
+  }
+
+  return message || '生成失败，请重试'
+}
+
 function getTrimmedString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
 }
@@ -207,7 +225,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Generate error:', error)
-    const errorMessage = error instanceof Error ? error.message : '生成失败，请重试'
+    const errorMessage = getFriendlyServerError(error)
     return jsonError(errorMessage, 500)
   }
 }

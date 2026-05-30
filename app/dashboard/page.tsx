@@ -40,6 +40,93 @@ const MODULE_TITLE_LABELS: Record<string, string> = {
 }
 
 const getModuleTitle = (title: string) => MODULE_TITLE_LABELS[title.trim()] || title
+const MAX_ORIGINAL_IMAGE_BYTES = 10 * 1024 * 1024
+const MAX_GENERATION_IMAGE_BYTES = 1.5 * 1024 * 1024
+const MAX_GENERATION_IMAGE_DIMENSION = 1280
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('图片读取失败，请重新上传'))
+    reader.readAsDataURL(file)
+  })
+}
+
+async function compressImageForGeneration(file: File) {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('请上传图片文件')
+  }
+
+  const objectUrl = URL.createObjectURL(file)
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = document.createElement('img')
+      img.onload = () => resolve(img)
+      img.onerror = () => reject(new Error('图片解析失败，请换一张 JPG、PNG 或 WebP 图片'))
+      img.src = objectUrl
+    })
+
+    const scale = Math.min(
+      1,
+      MAX_GENERATION_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight)
+    )
+    const width = Math.max(1, Math.round(image.naturalWidth * scale))
+    const height = Math.max(1, Math.round(image.naturalHeight * scale))
+
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const context = canvas.getContext('2d')
+    if (!context) {
+      throw new Error('图片处理失败，请换一张图片重试')
+    }
+
+    context.fillStyle = '#ffffff'
+    context.fillRect(0, 0, width, height)
+    context.drawImage(image, 0, 0, width, height)
+
+    const qualities = [0.82, 0.72, 0.62, 0.52]
+    let compressedBlob: Blob | null = null
+
+    for (const quality of qualities) {
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, 'image/jpeg', quality)
+      })
+
+      if (!blob) continue
+      compressedBlob = blob
+      if (blob.size <= MAX_GENERATION_IMAGE_BYTES) break
+    }
+
+    if (!compressedBlob) {
+      throw new Error('图片压缩失败，请换一张图片重试')
+    }
+
+    return new File([compressedBlob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+      type: 'image/jpeg',
+    })
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
+}
+
+function getFriendlyGenerateError(message: string) {
+  if (
+    message.includes('Maximum call stack size exceeded') ||
+    message.includes('Unable to process input image') ||
+    message.includes('input image')
+  ) {
+    return '图片处理失败。请换一张更清晰的 JPG/PNG 图片，或先截图/压缩后再上传。'
+  }
+
+  if (message.includes('429')) {
+    return 'AI 服务当前繁忙，请稍后再试。'
+  }
+
+  return message
+}
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -79,22 +166,25 @@ export default function DashboardPage() {
     checkAuth()
   }, [router])
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > MAX_ORIGINAL_IMAGE_BYTES) {
       setError('图片大小不能超过 10MB')
       return
     }
 
-    setImage(file)
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string)
+    try {
+      const compressedFile = await compressImageForGeneration(file)
+      setImage(compressedFile)
+      setImagePreview(await readFileAsDataUrl(compressedFile))
+      setError('')
+    } catch (err: unknown) {
+      setImage(null)
+      setImagePreview(null)
+      setError(err instanceof Error ? err.message : '图片处理失败，请重新上传')
     }
-    reader.readAsDataURL(file)
-    setError('')
   }
 
   const removeImage = () => {
@@ -130,16 +220,8 @@ export default function DashboardPage() {
         return
       }
 
-      // Convert image to base64
-      const reader = new FileReader()
-      const base64Promise = new Promise<string>((resolve) => {
-        reader.onloadend = () => {
-          const base64 = (reader.result as string).split(',')[1]
-          resolve(base64)
-        }
-      })
-      reader.readAsDataURL(image)
-      const imageBase64 = await base64Promise
+      const imageDataUrl = await readFileAsDataUrl(image)
+      const imageBase64 = imageDataUrl.split(',')[1]
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -168,7 +250,7 @@ export default function DashboardPage() {
         setCredits(data.credits_remaining)
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '生成失败，请重试')
+      setError(err instanceof Error ? getFriendlyGenerateError(err.message) : '生成失败，请重试')
     } finally {
       setLoading(false)
     }
