@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Landing/Navbar'
 import Footer from '@/components/Landing/Footer'
 import { Check, Sparkles, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { getAccessToken } from '@/lib/client-auth'
 
 const plans = [
   {
@@ -88,9 +88,8 @@ export default function PricingPage() {
     setLoading(planKey)
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session) {
+      const accessToken = getAccessToken()
+      if (!accessToken) {
         router.push('/login')
         return
       }
@@ -99,7 +98,7 @@ export default function PricingPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ plan: planKey }),
       })

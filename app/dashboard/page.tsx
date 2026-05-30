@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Upload, X, Wand2, Copy, Check, Loader2, Image as ImageIcon } from 'lucide-react'
 import { VIDEO_TYPES, PLATFORMS } from '@/lib/constants/options'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { authedFetch, clearStoredSession, getAccessToken } from '@/lib/client-auth'
 
 interface GeneratedModule {
   title: string
@@ -59,21 +59,21 @@ export default function DashboardPage() {
   // Check auth and get credits
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      if (!getAccessToken()) {
         router.push('/login')
         return
       }
 
-      // Get user credits
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('credits_remaining')
-        .eq('id', session.user.id)
-        .single()
+      const response = await authedFetch('/api/user')
+      if (response.status === 401) {
+        clearStoredSession()
+        router.push('/login')
+        return
+      }
 
-      if (profile) {
-        setCredits(profile.credits_remaining)
+      if (response.ok) {
+        const data = await response.json()
+        setCredits(data.profile?.credits_remaining ?? null)
       }
     }
     checkAuth()
@@ -121,12 +121,11 @@ export default function DashboardPage() {
 
     setLoading(true)
     setError('')
-    setResult(null)
+      setResult(null)
 
     try {
-      // Get auth token
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      const accessToken = getAccessToken()
+      if (!accessToken) {
         router.push('/login')
         return
       }
@@ -146,7 +145,7 @@ export default function DashboardPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           productName,

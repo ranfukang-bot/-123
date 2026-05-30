@@ -4,8 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { withClientTimeout } from '@/lib/client-timeout'
+import { saveSession } from '@/lib/client-auth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -39,19 +39,22 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { error } = await withClientTimeout(
-        supabase.auth.signInWithPassword({
-          email,
-          password,
+      const response = await withClientTimeout(
+        fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
         }),
         '登录请求超时。当前网络可能无法连接认证服务，请稍后重试。'
       )
+      const data = await response.json()
 
-      if (error) {
-        setError(getFriendlyAuthError(error.message))
+      if (!response.ok || !data.session) {
+        setError(getFriendlyAuthError(data.error || '登录失败'))
         return
       }
 
+      saveSession(data.session)
       router.push('/dashboard')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '登录失败，请稍后重试')
@@ -67,15 +70,21 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { error } = await withClientTimeout(
-        supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login`,
+      const response = await withClientTimeout(
+        fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            redirectTo: `${window.location.origin}/login`,
+          }),
         }),
         '重置邮件发送请求超时，请稍后重试。'
       )
+      const data = await response.json()
 
-      if (error) {
-        setError(getFriendlyAuthError(error.message))
+      if (!response.ok) {
+        setError(getFriendlyAuthError(data.error || '发送失败'))
         return
       }
 

@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { withClientTimeout } from '@/lib/client-timeout'
+import { saveSession } from '@/lib/client-auth'
 
 const PENDING_SIGNUP_EMAIL_KEY = 'promptreel_pending_signup_email'
 const PENDING_SIGNUP_UNLOCK_AT_KEY = 'promptreel_pending_signup_unlock_at'
@@ -151,17 +151,20 @@ export default function RegisterPage() {
       }
 
       // 注册账号。Supabase 会发送 signup 验证码，避免再调用 signInWithOtp 触发限流。
-      const { error: signUpError } = await withClientTimeout(
-        supabase.auth.signUp({
-          email: normalizedEmail,
-          password,
+      const response = await withClientTimeout(
+        fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normalizedEmail, password }),
         }),
         '注册请求超时。当前网络可能无法连接认证服务，请稍后重试。'
       )
+      const data = await response.json()
 
-      if (signUpError) {
-        if (isRateLimitError(signUpError.message)) {
-          const seconds = getRateLimitSeconds(signUpError.message)
+      if (!response.ok) {
+        const errorMessage = data.error || '注册失败，请稍后重试'
+        if (isRateLimitError(errorMessage)) {
+          const seconds = getRateLimitSeconds(errorMessage)
           setEmail(normalizedEmail)
           savePendingSignup(normalizedEmail, seconds)
           setStep('verify')
@@ -170,7 +173,7 @@ export default function RegisterPage() {
           return
         }
 
-        setError(getFriendlyAuthError(signUpError.message))
+        setError(getFriendlyAuthError(errorMessage))
         return
       }
 
@@ -194,21 +197,24 @@ export default function RegisterPage() {
     const normalizedEmail = email.trim().toLowerCase()
 
     try {
-      const { error } = await withClientTimeout(
-        supabase.auth.resend({
-          type: 'signup',
-          email: normalizedEmail,
+      const response = await withClientTimeout(
+        fetch('/api/auth/resend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normalizedEmail }),
         }),
         '验证码发送请求超时，请稍后重试。'
       )
+      const data = await response.json()
 
-      if (error) {
-        if (isRateLimitError(error.message)) {
-          const seconds = getRateLimitSeconds(error.message)
+      if (!response.ok) {
+        const errorMessage = data.error || '发送失败，请稍后重试'
+        if (isRateLimitError(errorMessage)) {
+          const seconds = getRateLimitSeconds(errorMessage)
           savePendingSignup(normalizedEmail, seconds)
           startCountdown(seconds)
         }
-        setError('发送失败：' + getFriendlyAuthError(error.message))
+        setError('发送失败：' + getFriendlyAuthError(errorMessage))
       } else {
         savePendingSignup(normalizedEmail, 60)
         startCountdown(60)
@@ -232,21 +238,23 @@ export default function RegisterPage() {
         return
       }
 
-      const { error } = await withClientTimeout(
-        supabase.auth.verifyOtp({
-          email,
-          token: otpCode,
-          type: 'signup',
+      const response = await withClientTimeout(
+        fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, token: otpCode }),
         }),
         '验证码验证请求超时，请稍后重试。'
       )
+      const data = await response.json()
 
-      if (error) {
-        setError('验证码错误或已过期')
+      if (!response.ok || !data.session) {
+        setError(data.error || '验证码错误或已过期')
         return
       }
 
       // 验证成功，跳转到工作台
+      saveSession(data.session)
       clearPendingSignup()
       router.push('/dashboard')
     } catch (err: unknown) {

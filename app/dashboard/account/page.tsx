@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { User, CreditCard, Zap, Crown, ArrowRight } from 'lucide-react'
+import { authedFetch, clearStoredSession, getAccessToken } from '@/lib/client-auth'
 
 interface Profile {
   email: string
@@ -35,21 +35,24 @@ export default function AccountPage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      if (!getAccessToken()) {
         router.push('/login')
         return
       }
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single()
+      const response = await authedFetch('/api/user')
 
-      if (!error && data) {
-        setProfile(data)
+      if (response.status === 401) {
+        clearStoredSession()
+        router.push('/login')
+        return
       }
+
+      if (response.ok) {
+        const data = await response.json()
+        setProfile(data.profile)
+      }
+
       setLoading(false)
     }
 

@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Copy, Check, Clock, Film } from 'lucide-react'
 import { VIDEO_TYPE_LABELS } from '@/lib/constants/options'
+import { authedFetch, clearStoredSession, getAccessToken } from '@/lib/client-auth'
 
 interface Generation {
   id: string
@@ -23,21 +23,22 @@ export default function HistoryPage() {
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      if (!getAccessToken()) {
         router.push('/login')
         return
       }
 
-      const { data, error } = await supabase
-        .from('generations')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false })
-        .limit(50)
+      const response = await authedFetch('/api/history')
 
-      if (!error && data) {
-        setGenerations(data)
+      if (response.status === 401) {
+        clearStoredSession()
+        router.push('/login')
+        return
+      }
+
+      if (response.ok) {
+        const data = await response.json()
+        setGenerations(data.generations || [])
       }
       setLoading(false)
     }

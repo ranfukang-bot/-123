@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Sparkles, Wand2, History, User, LogOut, CreditCard } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { clearStoredSession, getAccessToken } from '@/lib/client-auth'
 
 const navItems = [
   { href: '/dashboard', label: '生成提示词', icon: Wand2 },
@@ -20,28 +20,22 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [hasSession] = useState(() =>
+    typeof window === 'undefined' ? false : Boolean(getAccessToken())
+  )
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.replace('/login')
-        return
-      }
-
-      setCheckingAuth(false)
+    if (!hasSession) {
+      router.replace('/login')
     }
+  }, [hasSession, router])
 
-    checkAuth()
-  }, [router])
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
+  const handleLogout = () => {
+    clearStoredSession()
     router.push('/')
   }
 
-  if (checkingAuth) {
+  if (!hasSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
         <div className="text-center">
