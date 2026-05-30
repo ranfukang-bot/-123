@@ -119,6 +119,10 @@ export default function RegisterPage() {
       return '该邮箱已注册，请直接登录'
     }
 
+    if (message.includes('该邮箱已注册')) {
+      return '该邮箱已注册，请直接登录'
+    }
+
     if (message.includes('For security purposes') || message.includes('email rate limit exceeded')) {
       return '验证码发送太频繁，请稍后再试'
     }
