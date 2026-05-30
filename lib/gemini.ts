@@ -1,0 +1,48 @@
+import OpenAI from 'openai'
+import { SYSTEM_PROMPT, buildUserMessage } from './prompts/system'
+
+const openai = new OpenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+  baseURL: process.env.GEMINI_BASE_URL || 'https://yunwu.ai/v1',
+})
+
+interface GenerateParams {
+  productName: string
+  videoType: string
+  extraRequirements: string
+  platform?: string
+  imageBase64?: string
+  imageMimeType?: string
+}
+
+export async function generateVideoPrompt(params: GenerateParams) {
+  const { productName, videoType, extraRequirements, platform, imageBase64, imageMimeType } = params
+
+  const userMessage = buildUserMessage(productName, videoType, extraRequirements, platform)
+
+  const content: Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }> = []
+
+  if (imageBase64 && imageMimeType) {
+    content.push({
+      type: 'image_url',
+      image_url: {
+        url: `data:${imageMimeType};base64,${imageBase64}`,
+      },
+    })
+  }
+
+  content.push({ type: 'text', text: userMessage })
+
+  const completion = await openai.chat.completions.create({
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content },
+    ],
+    temperature: 0.7,
+    top_p: 0.9,
+    max_tokens: 4096,
+  })
+
+  return completion.choices[0].message.content || ''
+}
