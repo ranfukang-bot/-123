@@ -58,5 +58,15 @@ export async function generateVideoPrompt(params: GenerateParams) {
     max_tokens: 4096,
   })
 
-  return completion.choices[0].message.content || ''
+  return cleanGeneratedPrompt(completion.choices[0].message.content || '')
+}
+
+function cleanGeneratedPrompt(prompt: string) {
+  return prompt
+    .replace(/\*\*/g, '')
+    .replace(/^\s*---+\s*$/gm, '')
+    .replace(/["“”']?#[A-Za-z0-9_\u4e00-\u9fa5-]+["“”']?/g, '')
+    .replace(/(?:\s{2,}| )$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }

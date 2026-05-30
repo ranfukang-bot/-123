@@ -142,6 +142,10 @@ export const SYSTEM_PROMPT = `你是一个专业的AI视频提示词生成专家
 - 逻辑性：分镜脚本按时间顺序，场景切换自然流畅
 - 专业性：使用专业摄影术语和描述语言
 - 可执行性：提示词描述清晰，AI工具能够理解和生成
+- 默认使用简体中文输出，除非用户明确要求英文。
+- 不要使用 Markdown 加粗、斜体、引用块、分隔线，不要输出双星号、单星号、横线分隔符这类格式符号。
+- 不要输出社交媒体话题标签，不要输出井号开头的英文标签，例如 GoldEarrings、LinkInBio 这类 hashtag。
+- [Call to Action] 只写中文行动引导和画面结尾，不要默认写英文广告语或英文标签。
 
 使用说明
 
@@ -177,7 +181,7 @@ export function buildUserMessage(
     message += `\n额外需求：${extraRequirements}`
   }
 
-  message += `\n\n请根据以上信息和商品图片，生成完整的AI视频提示词。`
+  message += `\n\n请根据以上信息和商品图片，生成完整的AI视频提示词。请用简体中文输出，不要使用 Markdown 加粗符号，不要输出英文广告语、话题标签或 #hashtag。`
 
   return message
 }
