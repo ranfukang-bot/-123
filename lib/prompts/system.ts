@@ -166,9 +166,9 @@ export const SYSTEM_PROMPT = `你是一个专业的AI视频提示词生成专家
 
 // 构建用户消息
 interface BuildUserMessageParams {
-  productName: string,
-  videoType: string,
-  extraRequirements: string,
+  productName: string
+  videoType: string
+  extraRequirements: string
   platform?: string
   durationSeconds?: number
   targetRegion?: string
@@ -182,23 +182,22 @@ export function buildUserMessage({
   platform,
   targetRegion,
 }: BuildUserMessageParams): string {
-  let message = `商品名称：${productName}\n视频类型：${videoType}`
+  const requirements = [
+    `我要做「${productName}」的带货视频。`,
+    `视频类型是「${videoType}」。`,
+    `目标时长是 ${durationSeconds} 秒。`,
+    platform ? `发布平台是「${platform}」。` : '',
+    targetRegion ? `带货地区是「${targetRegion}」。` : '',
+    extraRequirements ? `额外要求：${extraRequirements}。` : '',
+  ].filter(Boolean).join('')
 
-  message += `\n目标时长：${durationSeconds} 秒`
-  message += `\n时长要求：最佳时长 15 秒，最长 30 秒；如果用户选择更长时长，请保持镜头简洁，不要堆砌过多无关分镜。`
+  let message = `完整创作需求：${requirements}`
 
-  if (platform) {
-    message += `\n发布平台：${platform}`
-  }
-
-  if (targetRegion) {
-    message += `\n带货地区：${targetRegion}`
-    message += `\n地区适配要求：场景、人物、语言氛围、生活习惯和消费表达要贴近该地区用户，避免明显不符合当地语境的元素。`
-  }
-
-  if (extraRequirements) {
-    message += `\n额外需求：${extraRequirements}`
-  }
+  message += `\n\n用户上传了商品或风格相关图片，请直接结合所有图片进行理解，不要要求用户说明每张图片的用途。`
+  message += `\n请把商品图、用户选择的视频类型、目标时长、发布平台、带货地区和额外要求整合成一个统一的视频创作判断，再生成提示词。`
+  message += `\n如果带货地区存在，请让场景、人物气质、语言氛围、消费表达和生活习惯贴近该地区用户。`
+  message += `\n时长要求：最佳时长 15 秒，最长 30 秒；如果用户选择更长时长，请保持镜头简洁，不要堆砌无关分镜。`
+  message += `\n重要：最终分镜必须服务于 ${durationSeconds} 秒的视频长度，分镜数量、每镜时长和节奏要匹配这个时长。`
 
   message += `\n\n请根据以上信息和商品图片，生成完整的AI视频提示词。请用简体中文输出，不要使用 Markdown 加粗符号，不要输出英文广告语、话题标签或 #hashtag。`
 

@@ -93,7 +93,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 # Gemini API 代理
 GEMINI_API_KEY=
 GEMINI_BASE_URL=https://yunwu.ai/v1
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3-flash-preview
 
 # LemonSqueezy
 LEMONSQUEEZY_API_KEY=

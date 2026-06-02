@@ -2,6 +2,7 @@ import OpenAI from 'openai'
 import { SYSTEM_PROMPT, buildUserMessage } from './prompts/system'
 
 let openai: OpenAI | null = null
+const DEFAULT_GEMINI_MODEL = 'gemini-3-flash-preview'
 
 function getOpenAIClient() {
   const apiKey = process.env.GEMINI_API_KEY
@@ -27,8 +28,10 @@ interface GenerateParams {
   extraRequirements: string
   platform?: string
   targetRegion?: string
-  imageBase64?: string
-  imageMimeType?: string
+  images?: Array<{
+    base64: string
+    mimeType: string
+  }>
 }
 
 export async function generateVideoPrompt(params: GenerateParams) {
@@ -39,8 +42,7 @@ export async function generateVideoPrompt(params: GenerateParams) {
     extraRequirements,
     platform,
     targetRegion,
-    imageBase64,
-    imageMimeType,
+    images = [],
   } = params
 
   const userMessage = buildUserMessage({
@@ -54,11 +56,11 @@ export async function generateVideoPrompt(params: GenerateParams) {
 
   const content: Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }> = []
 
-  if (imageBase64 && imageMimeType) {
+  for (const image of images) {
     content.push({
       type: 'image_url',
       image_url: {
-        url: `data:${imageMimeType};base64,${imageBase64}`,
+        url: `data:${image.mimeType};base64,${image.base64}`,
       },
     })
   }
@@ -66,7 +68,7 @@ export async function generateVideoPrompt(params: GenerateParams) {
   content.push({ type: 'text', text: userMessage })
 
   const completion = await getOpenAIClient().chat.completions.create({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content },

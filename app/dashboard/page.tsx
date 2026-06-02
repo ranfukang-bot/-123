@@ -43,7 +43,13 @@ const getModuleTitle = (title: string) => MODULE_TITLE_LABELS[title.trim()] || t
 const MAX_ORIGINAL_IMAGE_BYTES = 10 * 1024 * 1024
 const MAX_GENERATION_IMAGE_BYTES = 1.5 * 1024 * 1024
 const MAX_GENERATION_IMAGE_DIMENSION = 1280
+const MAX_IMAGE_COUNT = 3
 const VIDEO_DURATION_OPTIONS = [5, 10, 15, 20, 25, 30]
+
+interface UploadedImage {
+  file: File
+  preview: string
+}
 
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
@@ -131,8 +137,7 @@ function getFriendlyGenerateError(message: string) {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [image, setImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [images, setImages] = useState<UploadedImage[]>([])
   const [productName, setProductName] = useState('')
   const [videoType, setVideoType] = useState('')
   const [durationSeconds, setDurationSeconds] = useState('15')
@@ -170,36 +175,46 @@ export default function DashboardPage() {
   }, [router])
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const selectedFiles = Array.from(e.target.files || [])
+    if (selectedFiles.length === 0) return
 
-    if (file.size > MAX_ORIGINAL_IMAGE_BYTES) {
-      setError('图片大小不能超过 10MB')
+    if (images.length + selectedFiles.length > MAX_IMAGE_COUNT) {
+      setError(`最多上传 ${MAX_IMAGE_COUNT} 张图片`)
       return
     }
 
     try {
-      const compressedFile = await compressImageForGeneration(file)
-      setImage(compressedFile)
-      setImagePreview(await readFileAsDataUrl(compressedFile))
+      const nextImages = await Promise.all(
+        selectedFiles.map(async (file) => {
+          if (file.size > MAX_ORIGINAL_IMAGE_BYTES) {
+            throw new Error('单张图片大小不能超过 10MB')
+          }
+
+          const compressedFile = await compressImageForGeneration(file)
+          return {
+            file: compressedFile,
+            preview: await readFileAsDataUrl(compressedFile),
+          }
+        })
+      )
+
+      setImages((current) => [...current, ...nextImages].slice(0, MAX_IMAGE_COUNT))
       setError('')
     } catch (err: unknown) {
-      setImage(null)
-      setImagePreview(null)
       setError(err instanceof Error ? err.message : '图片处理失败，请重新上传')
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
-  const removeImage = () => {
-    setImage(null)
-    setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+  const removeImage = (indexToRemove: number) => {
+    setImages((current) => current.filter((_, index) => index !== indexToRemove))
   }
 
   const handleGenerate = async () => {
-    if (!image) {
+    if (images.length === 0) {
       setError('请上传商品图片')
       return
     }
@@ -223,8 +238,15 @@ export default function DashboardPage() {
         return
       }
 
-      const imageDataUrl = await readFileAsDataUrl(image)
-      const imageBase64 = imageDataUrl.split(',')[1]
+      const imagePayload = await Promise.all(
+        images.map(async (item) => {
+          const imageDataUrl = await readFileAsDataUrl(item.file)
+          return {
+            base64: imageDataUrl.split(',')[1],
+            mimeType: item.file.type,
+          }
+        })
+      )
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -239,8 +261,7 @@ export default function DashboardPage() {
           platform,
           targetRegion,
           extraRequirements,
-          imageBase64,
-          imageMimeType: image.type,
+          images: imagePayload,
         }),
       })
 
@@ -320,21 +341,43 @@ export default function DashboardPage() {
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium mb-2">商品图片</label>
-            {imagePreview ? (
-              <div className="relative h-72 rounded-xl overflow-hidden border border-gray-200">
-                <Image
-                  src={imagePreview}
-                  alt="商品图片预览"
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-                <button
-                  onClick={removeImage}
-                  className="absolute top-2 right-2 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            {images.length > 0 ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {images.map((item, index) => (
+                    <div key={`${item.file.name}-${index}`} className="relative aspect-square overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+                      <Image
+                        src={item.preview}
+                        alt={`商品图片 ${index + 1} 预览`}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                      <div className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur">
+                        {index + 1}
+                      </div>
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-white transition-colors hover:bg-black/75"
+                        aria-label="删除图片"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {images.length < MAX_IMAGE_COUNT && (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-white text-sm text-gray-500 transition-all hover:border-[#2454d6] hover:bg-blue-50/40"
+                    >
+                      继续添加
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs leading-5 text-gray-500">
+                  最多上传 3 张图片。图片会一起发送给 AI 识别商品、人物、场景和细节。
+                </p>
               </div>
             ) : (
               <div
@@ -345,13 +388,14 @@ export default function DashboardPage() {
                   <Upload className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-sm text-gray-600 mb-1">点击或拖拽上传商品图片</p>
-                <p className="text-xs text-gray-400">支持 JPG、PNG、WebP，最大 10MB</p>
+                <p className="text-xs text-gray-400">支持 JPG、PNG、WebP，最多 3 张，单张最大 10MB</p>
               </div>
             )}
             <input
               ref={fileInputRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              multiple
               onChange={handleImageChange}
               className="hidden"
             />

@@ -4,8 +4,14 @@ import { generateVideoPrompt } from '@/lib/gemini'
 import { PLATFORM_VALUES, VIDEO_TYPE_VALUES } from '@/lib/constants/options'
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024
+const MAX_IMAGE_COUNT = 3
 const MAX_JSON_BYTES = 15 * 1024 * 1024
 const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
+
+interface GenerateImageInput {
+  base64: string
+  mimeType: string
+}
 
 interface GenerateBody {
   productName?: unknown
@@ -14,6 +20,7 @@ interface GenerateBody {
   platform?: unknown
   targetRegion?: unknown
   extraRequirements?: unknown
+  images?: unknown
   imageBase64?: unknown
   imageMimeType?: unknown
 }
@@ -32,8 +39,7 @@ type ValidatedGenerateBody =
         platform: string
         targetRegion: string
         extraRequirements: string
-        imageBase64: string
-        imageMimeType: string
+        images: GenerateImageInput[]
       }
     }
   | { error: string }
@@ -75,6 +81,50 @@ function getApproxBase64Bytes(value: string) {
   return Math.floor((value.length * 3) / 4) - padding
 }
 
+function getImageInputs(body: GenerateBody): GenerateImageInput[] {
+  if (Array.isArray(body.images)) {
+    return body.images
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null
+        const image = item as Record<string, unknown>
+        const base64 = getTrimmedString(image.base64)
+        const mimeType = getTrimmedString(image.mimeType)
+        return base64 && mimeType ? { base64, mimeType } : null
+      })
+      .filter((item): item is GenerateImageInput => item !== null)
+  }
+
+  const imageBase64 = getTrimmedString(body.imageBase64)
+  const imageMimeType = getTrimmedString(body.imageMimeType)
+  return imageBase64 && imageMimeType ? [{ base64: imageBase64, mimeType: imageMimeType }] : []
+}
+
+function validateImages(images: GenerateImageInput[]) {
+  if (images.length === 0) {
+    return '请上传商品图片'
+  }
+
+  if (images.length > MAX_IMAGE_COUNT) {
+    return `最多上传 ${MAX_IMAGE_COUNT} 张图片`
+  }
+
+  for (const image of images) {
+    if (!ALLOWED_IMAGE_MIME_TYPES.has(image.mimeType)) {
+      return '仅支持 JPG、PNG、WebP 图片'
+    }
+
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(image.base64)) {
+      return '图片数据格式不正确'
+    }
+
+    if (getApproxBase64Bytes(image.base64) > MAX_IMAGE_BYTES) {
+      return '单张图片大小不能超过 10MB'
+    }
+  }
+
+  return ''
+}
+
 function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
   const productName = getTrimmedString(body.productName)
   const videoType = getTrimmedString(body.videoType)
@@ -82,10 +132,9 @@ function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
   const platform = getTrimmedString(body.platform)
   const targetRegion = getTrimmedString(body.targetRegion)
   const extraRequirements = getTrimmedString(body.extraRequirements)
-  const imageBase64 = getTrimmedString(body.imageBase64)
-  const imageMimeType = getTrimmedString(body.imageMimeType)
+  const images = getImageInputs(body)
 
-  if (!productName || !videoType || !imageBase64) {
+  if (!productName || !videoType || images.length === 0) {
     return { error: '请填写完整信息并上传图片' }
   }
 
@@ -113,16 +162,9 @@ function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
     return { error: '无效的发布平台' }
   }
 
-  if (!ALLOWED_IMAGE_MIME_TYPES.has(imageMimeType)) {
-    return { error: '仅支持 JPG、PNG、WebP 图片' }
-  }
-
-  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) {
-    return { error: '图片数据格式不正确' }
-  }
-
-  if (getApproxBase64Bytes(imageBase64) > MAX_IMAGE_BYTES) {
-    return { error: '图片大小不能超过 10MB' }
+  const imageError = validateImages(images)
+  if (imageError) {
+    return { error: imageError }
   }
 
   return {
@@ -133,8 +175,7 @@ function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
       platform,
       targetRegion,
       extraRequirements,
-      imageBase64,
-      imageMimeType,
+      images,
     },
   }
 }
@@ -211,8 +252,7 @@ export async function POST(request: NextRequest) {
       platform,
       targetRegion,
       extraRequirements,
-      imageBase64,
-      imageMimeType,
+      images,
     } = parsed.data
 
     // 4. Atomically reserve one generation credit before spending AI tokens.
@@ -230,8 +270,7 @@ export async function POST(request: NextRequest) {
       extraRequirements: extraRequirements || '',
       platform,
       targetRegion,
-      imageBase64,
-      imageMimeType,
+      images,
     })
 
     // 6. Save generation record
