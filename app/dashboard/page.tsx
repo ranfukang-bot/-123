@@ -43,6 +43,7 @@ const getModuleTitle = (title: string) => MODULE_TITLE_LABELS[title.trim()] || t
 const MAX_ORIGINAL_IMAGE_BYTES = 10 * 1024 * 1024
 const MAX_GENERATION_IMAGE_BYTES = 1.5 * 1024 * 1024
 const MAX_GENERATION_IMAGE_DIMENSION = 1280
+const VIDEO_DURATION_OPTIONS = [5, 10, 15, 20, 25, 30]
 
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
@@ -134,7 +135,9 @@ export default function DashboardPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [productName, setProductName] = useState('')
   const [videoType, setVideoType] = useState('')
+  const [durationSeconds, setDurationSeconds] = useState('15')
   const [platform, setPlatform] = useState('')
+  const [targetRegion, setTargetRegion] = useState('')
   const [extraRequirements, setExtraRequirements] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<string | null>(null)
@@ -211,7 +214,7 @@ export default function DashboardPage() {
 
     setLoading(true)
     setError('')
-      setResult(null)
+    setResult(null)
 
     try {
       const accessToken = getAccessToken()
@@ -232,7 +235,9 @@ export default function DashboardPage() {
         body: JSON.stringify({
           productName,
           videoType,
+          durationSeconds: Number(durationSeconds),
           platform,
+          targetRegion,
           extraRequirements,
           imageBase64,
           imageMimeType: image.type,
@@ -381,6 +386,25 @@ export default function DashboardPage() {
             </select>
           </div>
 
+          {/* Duration */}
+          <div>
+            <label className="block text-sm font-medium mb-2">视频时长</label>
+            <select
+              value={durationSeconds}
+              onChange={(e) => setDurationSeconds(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2454d6] focus:border-transparent bg-white"
+            >
+              {VIDEO_DURATION_OPTIONS.map((seconds) => (
+                <option key={seconds} value={seconds}>
+                  {seconds} 秒
+                </option>
+              ))}
+            </select>
+            <p className="mt-2 text-xs leading-5 text-gray-500">
+              最佳时长 15 秒，时长过长可能导致效果不好，最长 30 秒。
+            </p>
+          </div>
+
           {/* Platform */}
           <div>
             <label className="block text-sm font-medium mb-2">发布平台（可选）</label>
@@ -396,6 +420,18 @@ export default function DashboardPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Target Region */}
+          <div>
+            <label className="block text-sm font-medium mb-2">带货地区（可选）</label>
+            <input
+              type="text"
+              value={targetRegion}
+              onChange={(e) => setTargetRegion(e.target.value)}
+              placeholder="例如：印尼、美国"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2454d6] focus:border-transparent bg-white"
+            />
           </div>
 
           {/* Extra Requirements */}

@@ -9,6 +9,7 @@ export const VIDEO_TYPES = [
 export const PLATFORMS = [
   { value: '抖音', label: '抖音' },
   { value: '小红书', label: '小红书' },
+  { value: 'TikTok', label: 'TikTok' },
   { value: 'B站', label: 'B站' },
   { value: '快手', label: '快手' },
   { value: '视频号', label: '视频号' },

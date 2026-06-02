@@ -23,16 +23,34 @@ function getOpenAIClient() {
 interface GenerateParams {
   productName: string
   videoType: string
+  durationSeconds?: number
   extraRequirements: string
   platform?: string
+  targetRegion?: string
   imageBase64?: string
   imageMimeType?: string
 }
 
 export async function generateVideoPrompt(params: GenerateParams) {
-  const { productName, videoType, extraRequirements, platform, imageBase64, imageMimeType } = params
+  const {
+    productName,
+    videoType,
+    durationSeconds,
+    extraRequirements,
+    platform,
+    targetRegion,
+    imageBase64,
+    imageMimeType,
+  } = params
 
-  const userMessage = buildUserMessage(productName, videoType, extraRequirements, platform)
+  const userMessage = buildUserMessage({
+    productName,
+    videoType,
+    durationSeconds,
+    extraRequirements,
+    platform,
+    targetRegion,
+  })
 
   const content: Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }> = []
 

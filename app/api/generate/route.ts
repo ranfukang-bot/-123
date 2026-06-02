@@ -10,7 +10,9 @@ const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp
 interface GenerateBody {
   productName?: unknown
   videoType?: unknown
+  durationSeconds?: unknown
   platform?: unknown
+  targetRegion?: unknown
   extraRequirements?: unknown
   imageBase64?: unknown
   imageMimeType?: unknown
@@ -26,7 +28,9 @@ type ValidatedGenerateBody =
       data: {
         productName: string
         videoType: string
+        durationSeconds: number
         platform: string
+        targetRegion: string
         extraRequirements: string
         imageBase64: string
         imageMimeType: string
@@ -60,6 +64,12 @@ function getTrimmedString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
 }
 
+function getDurationSeconds(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.trunc(value)
+  if (typeof value === 'string' && value.trim()) return Math.trunc(Number(value))
+  return 15
+}
+
 function getApproxBase64Bytes(value: string) {
   const padding = value.endsWith('==') ? 2 : value.endsWith('=') ? 1 : 0
   return Math.floor((value.length * 3) / 4) - padding
@@ -68,7 +78,9 @@ function getApproxBase64Bytes(value: string) {
 function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
   const productName = getTrimmedString(body.productName)
   const videoType = getTrimmedString(body.videoType)
+  const durationSeconds = getDurationSeconds(body.durationSeconds)
   const platform = getTrimmedString(body.platform)
+  const targetRegion = getTrimmedString(body.targetRegion)
   const extraRequirements = getTrimmedString(body.extraRequirements)
   const imageBase64 = getTrimmedString(body.imageBase64)
   const imageMimeType = getTrimmedString(body.imageMimeType)
@@ -79,6 +91,14 @@ function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
 
   if (productName.length > 80) {
     return { error: '商品名称不能超过 80 个字符' }
+  }
+
+  if (!Number.isInteger(durationSeconds) || durationSeconds < 5 || durationSeconds > 30) {
+    return { error: '视频时长必须在 5-30 秒之间' }
+  }
+
+  if (targetRegion.length > 80) {
+    return { error: '带货地区不能超过 80 个字符' }
   }
 
   if (extraRequirements.length > 800) {
@@ -109,7 +129,9 @@ function validateGenerateBody(body: GenerateBody): ValidatedGenerateBody {
     data: {
       productName,
       videoType,
+      durationSeconds,
       platform,
+      targetRegion,
       extraRequirements,
       imageBase64,
       imageMimeType,
@@ -182,7 +204,16 @@ export async function POST(request: NextRequest) {
       return jsonError(parsed.error, 400)
     }
 
-    const { productName, videoType, platform, extraRequirements, imageBase64, imageMimeType } = parsed.data
+    const {
+      productName,
+      videoType,
+      durationSeconds,
+      platform,
+      targetRegion,
+      extraRequirements,
+      imageBase64,
+      imageMimeType,
+    } = parsed.data
 
     // 4. Atomically reserve one generation credit before spending AI tokens.
     const creditResult = await consumeCredit(user.id)
@@ -195,8 +226,10 @@ export async function POST(request: NextRequest) {
     const prompt = await generateVideoPrompt({
       productName,
       videoType,
+      durationSeconds,
       extraRequirements: extraRequirements || '',
       platform,
+      targetRegion,
       imageBase64,
       imageMimeType,
     })
@@ -206,7 +239,11 @@ export async function POST(request: NextRequest) {
       user_id: user.id,
       product_name: productName,
       video_type: videoType,
-      extra_requirements: extraRequirements || '',
+      extra_requirements: [
+        targetRegion ? `带货地区：${targetRegion}` : '',
+        durationSeconds ? `视频时长：${durationSeconds} 秒` : '',
+        extraRequirements || '',
+      ].filter(Boolean).join('\n'),
       platform: platform || '',
       output_prompt: prompt,
     })
