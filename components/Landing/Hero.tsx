@@ -1,14 +1,26 @@
 import Link from 'next/link'
-import {
-  ArrowRight,
-  BadgeCheck,
-  Clapperboard,
-  ImagePlus,
-  MousePointerClick,
-  Sparkles,
-} from 'lucide-react'
+import { ArrowRight, BadgeCheck, Clapperboard, Sparkles } from 'lucide-react'
 
-const promptBlocks = ['商品识别', '卖点提炼', '分镜脚本', '镜头语言', '成片口播']
+const heroReels = [
+  {
+    title: '服装穿搭',
+    caption: '上身展示 / 街拍节奏',
+    src: '/showcase/fashion.mp4',
+    className: 'md:col-span-7 md:row-span-2',
+  },
+  {
+    title: '饰品细节',
+    caption: '近景质感 / 光泽氛围',
+    src: '/showcase/jewelry.mp4',
+    className: 'md:col-span-5',
+  },
+  {
+    title: '家居小电器',
+    caption: '生活场景 / 功能演示',
+    src: '/showcase/appliance.mp4',
+    className: 'md:col-span-5',
+  },
+]
 
 export default function Hero() {
   return (
@@ -17,7 +29,7 @@ export default function Hero() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
       <div className="hero-scanline" />
 
-      <div className="relative mx-auto grid min-h-[760px] max-w-7xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
+      <div className="relative mx-auto grid min-h-[820px] max-w-7xl grid-cols-1 items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[0.78fr_1.22fr] lg:px-8">
         <div className="max-w-2xl">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-sm font-medium text-white/80 shadow-2xl shadow-blue-950/30 backdrop-blur">
             <Sparkles className="h-4 w-4 text-cyan-300" />
@@ -25,15 +37,16 @@ export default function Hero() {
           </div>
 
           <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-            把商品图变成
-            <span className="block text-transparent bg-clip-text bg-[linear-gradient(90deg,#8ee8ff,#5b7cff_45%,#36f0aa)]">
+            把商品素材变成
+            <span className="block bg-[linear-gradient(90deg,#8ee8ff,#5b7cff_45%,#36f0aa)] bg-clip-text text-transparent">
               可直接开拍的
             </span>
             <span className="block">带货视频方案</span>
           </h1>
 
           <p className="mt-6 max-w-xl text-base leading-8 text-white/68 sm:text-lg">
-            上传商品图，自动拆解卖点、场景、镜头、动作和口播节奏。不是空泛文案，而是一份运营、剪辑、AI 视频工具都能直接用的成片蓝图。
+            上传商品图，自动拆解卖点、场景、镜头、动作和口播节奏。输出不是空泛文案，而是一份运营、剪辑、AI
+            视频工具都能直接接着用的成片蓝图。
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -45,10 +58,10 @@ export default function Hero() {
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href="#showcase"
+              href="/features"
               className="button-pop inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-6 py-3 text-sm font-semibold text-white/90 backdrop-blur hover:bg-white/12"
             >
-              看展示
+              查看能力
               <Clapperboard className="h-4 w-4" />
             </Link>
           </div>
@@ -66,71 +79,46 @@ export default function Hero() {
         <div className="relative">
           <div className="absolute -inset-4 rounded-[2rem] border border-white/8" />
           <div className="creative-stage relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-3 shadow-2xl shadow-black/40 backdrop-blur">
-            <div className="grid gap-3 lg:grid-cols-[0.82fr_1.18fr]">
-              <div className="space-y-3">
-                <div className="rounded-2xl border border-white/10 bg-[#101623] p-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <ImagePlus className="h-4 w-4 text-cyan-300" />
-                      商品输入
-                    </span>
-                    <span className="rounded-full bg-cyan-300/10 px-2 py-1 text-xs text-cyan-200">AI Vision</span>
-                  </div>
-                  <div className="mt-4 aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(145deg,#182034,#0b1020)] p-3">
-                    <div className="product-glow flex h-full flex-col justify-end rounded-xl p-4">
-                      <div className="mb-auto h-28 rounded-2xl bg-[radial-gradient(circle_at_35%_25%,#fff7c7,transparent_28%),linear-gradient(145deg,#9b6b22,#f4c96e_45%,#6d4516)] shadow-2xl shadow-amber-400/20" />
-                      <p className="mt-4 text-xs text-white/55">水滴金耳环 / 抖音种草</p>
-                      <div className="mt-3 h-2 w-3/4 rounded bg-white/18" />
-                      <div className="mt-2 h-2 w-1/2 rounded bg-white/10" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <MousePointerClick className="h-4 w-4 text-emerald-300" />
-                    点击生成
-                  </div>
-                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                    <div className="progress-flow h-full w-2/3 rounded-full bg-[linear-gradient(90deg,#36f0aa,#5b7cff,#8ee8ff)]" />
-                  </div>
-                </div>
+            <div className="mb-3 flex items-center justify-between px-2 py-1">
+              <div>
+                <p className="text-sm font-semibold text-white">精选成片样例</p>
+                <p className="mt-1 text-xs text-white/48">服装、饰品、家居场景实时预览</p>
               </div>
-
-              <div className="rounded-2xl border border-white/10 bg-[#f7f8fb] p-4 text-gray-950">
-                <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                  <div>
-                    <p className="text-sm font-semibold">成片蓝图</p>
-                    <p className="mt-1 text-xs text-gray-500">商品卖点 → 分镜 → 视频提示词</p>
-                  </div>
-                  <span className="rounded-full bg-gray-950 px-3 py-1 text-xs text-white">Live Preview</span>
-                </div>
-
-                <div className="mt-4 space-y-3">
-                  {promptBlocks.map((block, index) => (
-                    <div
-                      key={block}
-                      className="prompt-flow-card rounded-2xl border border-gray-200 bg-white p-3"
-                      style={{ animationDelay: `${index * 0.18}s` }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold">{block}</span>
-                        <span className="text-xs text-gray-400">0{index + 1}</span>
-                      </div>
-                      <div className="mt-3 space-y-2">
-                        <div className="h-2 rounded-full bg-gray-200" />
-                        <div className="h-2 w-4/5 rounded-full bg-gray-100" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                自动播放
+              </span>
             </div>
-          </div>
 
-          <div className="absolute -bottom-6 right-6 hidden rounded-2xl border border-white/10 bg-white px-5 py-4 text-gray-950 shadow-xl md:block">
-            <p className="text-xs text-gray-500">今日生成</p>
-            <p className="mt-1 text-2xl font-semibold">128 条</p>
+            <div className="grid gap-3 md:grid-cols-12 md:grid-rows-2">
+              {heroReels.map((reel, index) => (
+                <div
+                  key={reel.title}
+                  className={`${reel.className} group relative min-h-[230px] overflow-hidden rounded-3xl border border-white/10 bg-[#111827] md:min-h-[260px]`}
+                >
+                  <video
+                    className="absolute inset-0 h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100"
+                    src={reel.src}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#080b12]/92 via-[#080b12]/20 to-transparent" />
+                  <div className="absolute left-5 right-5 top-5 flex items-center justify-between">
+                    <span className="rounded-full bg-black/35 px-3 py-1 text-xs text-white/80 backdrop-blur">
+                      样片 0{index + 1}
+                    </span>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-950">
+                      Preview
+                    </span>
+                  </div>
+                  <div className="absolute inset-x-5 bottom-5">
+                    <p className="text-sm text-white/72">{reel.caption}</p>
+                    <h2 className="mt-1 text-2xl font-semibold">{reel.title}</h2>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
