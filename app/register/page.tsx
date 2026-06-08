@@ -154,7 +154,7 @@ export default function RegisterPage() {
         return
       }
 
-      // 注册账号。Supabase 会发送 signup 验证码，避免再调用 signInWithOtp 触发限流。
+      // 注册账号并发送我们自己的邮箱验证码，避免依赖 Supabase 默认发信。
       const response = await withClientTimeout(
         fetch('/api/auth/signup', {
           method: 'POST',
@@ -183,9 +183,9 @@ export default function RegisterPage() {
 
       // 进入验证码输入步骤
       setEmail(normalizedEmail)
-      savePendingSignup(normalizedEmail, 60)
+      savePendingSignup(normalizedEmail, Number(data.cooldownSeconds || 60))
       setStep('verify')
-      startCountdown(60)
+      startCountdown(Number(data.cooldownSeconds || 60))
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '注册失败，请稍后重试')
     } finally {
@@ -252,8 +252,14 @@ export default function RegisterPage() {
       )
       const data = await response.json()
 
-      if (!response.ok || !data.session) {
+      if (!response.ok) {
         setError(data.error || '验证码错误或已过期')
+        return
+      }
+
+      if (!data.session) {
+        clearPendingSignup()
+        router.push('/login')
         return
       }
 
